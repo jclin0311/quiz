@@ -1,0 +1,47 @@
+# Topic roadmap from the design doc's prerequisite graph.
+# (id, name, x, y) — x/y are layout positions on a 0-100 grid.
+TOPICS = [
+    ("arrays", "Arrays & Hashing", 54, 3),
+    ("two-pointers", "Two Pointers", 42, 15),
+    ("stack", "Stack", 66, 14),
+    ("binary-search", "Binary Search", 22, 29),
+    ("sliding-window", "Sliding Window", 46, 29),
+    ("linked-list", "Linked List", 70, 29),
+    ("trees", "Trees", 46, 42),
+    ("tries", "Tries", 22, 54),
+    ("backtracking", "Backtracking", 66, 54),
+    ("heap", "Heap / Priority Queue", 36, 66),
+    ("graphs", "Graphs", 60, 68),
+    ("dp-1d", "1-D Dynamic Programming", 86, 68),
+    ("intervals", "Intervals", 8, 80),
+    ("greedy", "Greedy", 28, 92),
+    ("advanced-graphs", "Advanced Graphs", 50, 81),
+    ("dp-2d", "2-D Dynamic Programming", 72, 92),
+    ("bit-manipulation", "Bit Manipulation", 91, 81),
+    ("math", "Math & Geometry", 86, 103),
+]
+
+# (prerequisite, dependent)
+EDGES = [
+    ("arrays", "two-pointers"),
+    ("arrays", "stack"),
+    ("two-pointers", "binary-search"),
+    ("two-pointers", "sliding-window"),
+    ("two-pointers", "linked-list"),
+    ("binary-search", "trees"),
+    ("linked-list", "trees"),
+    ("trees", "tries"),
+    ("trees", "heap"),
+    ("trees", "backtracking"),
+    ("backtracking", "graphs"),
+    ("backtracking", "dp-1d"),
+    ("heap", "intervals"),
+    ("heap", "greedy"),
+    ("heap", "advanced-graphs"),
+    ("graphs", "advanced-graphs"),
+    ("graphs", "dp-2d"),
+    ("dp-1d", "dp-2d"),
+    ("dp-1d", "bit-manipulation"),
+    ("dp-2d", "math"),
+    ("bit-manipulation", "math"),
+]
