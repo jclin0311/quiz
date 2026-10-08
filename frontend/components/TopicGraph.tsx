@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { TopicGraph as Graph } from "@/lib/api";
+import { topicLabel, type TopicGraph as Graph } from "@/lib/api";
 
 const W = 100;
 const H = 108;
-const NODE_W = 21;
+const NODE_W = 30;
 const NODE_H = 8.4;
 
 /** Roadmap of topics with a mastery bar per node, laid out from the seed coordinates. */
@@ -54,8 +54,8 @@ export default function TopicGraph({ graph }: { graph: Graph }) {
                 stroke={active === n.id ? "var(--accent)" : mastered ? "var(--good)" : "var(--line)"}
                 strokeWidth={active === n.id ? 0.5 : 0.3}
               />
-              <text x={NODE_W / 2} y={4} textAnchor="middle" fontSize={2.9} fontWeight={600} fill="var(--ink)">
-                {n.name.length > 14 ? n.name.replace("Dynamic Programming", "DP").replace(" / Priority Queue", " / PQ") : n.name}
+              <text x={NODE_W / 2} y={4} textAnchor="middle" fontSize={2.8} fontWeight={600} fill="var(--ink)">
+                {topicLabel(n.id, n.name)}
               </text>
               <rect x={1.6} y={NODE_H - 2.4} width={NODE_W - 3.2} height={1.1} rx={0.55} fill="var(--track)" />
               <rect x={1.6} y={NODE_H - 2.4} width={((NODE_W - 3.2) * pct) / 100} height={1.1} rx={0.55} fill="var(--good)" />

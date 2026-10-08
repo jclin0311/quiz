@@ -13,6 +13,7 @@ from ..clock import local_today
 from ..db import get_db
 from ..mastery import recompute_user_mastery
 from ..models import Attempt, Choice, Company, Question, QuestionCompany, QuizSession, Topic, User
+from ..plans import get_plan
 from ..recommend import recommend
 from ..scheduling import complete_due_reviews, due_review_question_ids, schedule_reviews
 
@@ -45,7 +46,7 @@ def _new_session(db: Session, user: User, mode: str, today, qids: list[int], rea
         rng.shuffle(choice_ids)
         orders[str(qid)] = choice_ids
     session = QuizSession(
-        user_id=user.id, mode=mode, local_date=today, question_ids=qids, choice_orders=orders, reasons=reasons
+        user_id=user.id, mode=mode, plan=get_plan(user.plan).id, local_date=today, question_ids=qids, choice_orders=orders, reasons=reasons
     )
     db.add(session)
     db.commit()
@@ -97,6 +98,7 @@ def session_payload(db: Session, session: QuizSession) -> dict:
                     "id": q.id,
                     "title": q.title,
                     "lc_number": q.lc_number,
+                    "ref": q.ref,
                     "difficulty": q.difficulty,
                     "summary": q.summary,
                     "example": q.example,
@@ -125,6 +127,8 @@ def session_payload(db: Session, session: QuizSession) -> dict:
     return {
         "id": session.id,
         "mode": session.mode,
+        "plan": session.plan,
+        "hide_topics": get_plan(session.plan).hide_topics,
         "local_date": session.local_date.isoformat(),
         "finished": session.finished_at is not None,
         "items": items,
@@ -134,25 +138,40 @@ def session_payload(db: Session, session: QuizSession) -> dict:
 @router.post("")
 def create_session(body: CreateSession, user: User = Depends(current_user), db: Session = Depends(get_db)):
     today = local_today(user.timezone)
+    plan = get_plan(user.plan).id
     if body.mode in ("daily", "review"):
         existing = db.scalar(
             select(QuizSession).where(
                 QuizSession.user_id == user.id,
+                QuizSession.plan == plan,
                 QuizSession.mode == body.mode,
                 QuizSession.local_date == today,
             )
         )
         if existing:
             return session_payload(db, existing)
+    else:
+        # Reopen today's unfinished extra set rather than starting another.
+        for existing in db.scalars(
+            select(QuizSession).where(
+                QuizSession.user_id == user.id,
+                QuizSession.plan == plan,
+                QuizSession.mode == "extra",
+                QuizSession.local_date == today,
+            )
+        ):
+            answered = db.scalar(select(func.count()).select_from(Attempt).where(Attempt.session_id == existing.id))
+            if answered < len(existing.question_ids):
+                return session_payload(db, existing)
 
     if body.mode == "review":
-        qids = due_review_question_ids(db, user.id, today)
+        qids = due_review_question_ids(db, user.id, plan, today)
         if not qids:
             raise HTTPException(409, "Nothing to review")
         session = _new_session(db, user, "review", today, qids, {str(q): "Review" for q in qids})
     else:
         limit = user.daily_goal if body.mode == "daily" else EXTRA_SIZE
-        picks = recommend(db, user.id, today, limit, purpose=body.mode)
+        picks = recommend(db, user.id, today, limit, purpose=body.mode, plan=plan)
         if not picks:
             raise HTTPException(409, "No questions left")
         session = _new_session(
@@ -193,13 +212,14 @@ def answer(session_id: int, body: AnswerBody, user: User = Depends(current_user)
             choice_id=body.choice_id,
             is_correct=result["is_correct"],
             mode=session.mode,
+            plan=session.plan,
             local_date=today,
         )
     )
     if session.mode == "review":
-        complete_due_reviews(db, user.id, question.id, today)
+        complete_due_reviews(db, user.id, session.plan, question.id, today)
     else:
-        schedule_reviews(db, user.id, question.id, today)
+        schedule_reviews(db, user.id, session.plan, question.id, today)
     try:
         db.commit()
     except IntegrityError:  # concurrent duplicate submit

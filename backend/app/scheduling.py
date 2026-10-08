@@ -12,11 +12,11 @@ from .models import ReviewItem
 REVIEW_OFFSETS = (1, 2, 6, 31)
 
 
-def schedule_reviews(db: Session, user_id: int, question_id: int, solved_on: date) -> None:
-    """Create review items the first time a user solves a question. No-op afterwards."""
+def schedule_reviews(db: Session, user_id: int, plan: str, question_id: int, solved_on: date) -> None:
+    """Create review items the first time a user solves a question in a plan. No-op afterwards."""
     exists = db.scalar(
         select(ReviewItem.id).where(
-            ReviewItem.user_id == user_id, ReviewItem.question_id == question_id
+            ReviewItem.user_id == user_id, ReviewItem.plan == plan, ReviewItem.question_id == question_id
         )
     )
     if exists:
@@ -25,6 +25,7 @@ def schedule_reviews(db: Session, user_id: int, question_id: int, solved_on: dat
         db.add(
             ReviewItem(
                 user_id=user_id,
+                plan=plan,
                 question_id=question_id,
                 stage=stage,
                 due_date=solved_on + timedelta(days=offset),
@@ -32,12 +33,13 @@ def schedule_reviews(db: Session, user_id: int, question_id: int, solved_on: dat
         )
 
 
-def due_review_question_ids(db: Session, user_id: int, today: date) -> list[int]:
+def due_review_question_ids(db: Session, user_id: int, plan: str, today: date) -> list[int]:
     """Questions with at least one incomplete review due today or earlier (missed days roll over)."""
     rows = db.execute(
         select(ReviewItem.question_id, ReviewItem.due_date)
         .where(
             ReviewItem.user_id == user_id,
+            ReviewItem.plan == plan,
             ReviewItem.due_date <= today,
             ReviewItem.completed_at.is_(None),
         )
@@ -49,11 +51,12 @@ def due_review_question_ids(db: Session, user_id: int, today: date) -> list[int]
     return list(seen)
 
 
-def complete_due_reviews(db: Session, user_id: int, question_id: int, today: date) -> None:
+def complete_due_reviews(db: Session, user_id: int, plan: str, question_id: int, today: date) -> None:
     """Answering a review clears every stage of that question that is already due."""
     items = db.scalars(
         select(ReviewItem).where(
             ReviewItem.user_id == user_id,
+            ReviewItem.plan == plan,
             ReviewItem.question_id == question_id,
             ReviewItem.due_date <= today,
             ReviewItem.completed_at.is_(None),

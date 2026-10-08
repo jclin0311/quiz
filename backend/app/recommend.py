@@ -1,12 +1,18 @@
 """Deterministic question recommendation over the topic prerequisite graph.
 
+Mastery and today's misses come from every plan; the question pool, history
+and "already served" filters come from the current plan only (see plans.py).
+
 1. Pick target topics: weak/uncertain topics, topics missed today, and the
-   roadmap frontier (topics whose prerequisites are all ready).
+   roadmap frontier (topics whose prerequisites are all ready). Plans without
+   a roadmap treat every topic as unlocked.
 2. If a target's prerequisites are not ready, practice the prerequisite instead.
-3. Retrieve published questions for the targets and filter recent history.
-4. Rank by six features, diversify by topic, log scores and reasons.
+3. Retrieve published questions in the plan's pool and filter recent history.
+4. Rank by six features plus plan-specific ones, diversify by topic, log
+   scores and reasons.
 """
 
+import random
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
@@ -16,9 +22,9 @@ from sqlalchemy.orm import Session, selectinload
 
 from .mastery import READY_ATTEMPTS, READY_MASTERY, is_ready, mastery_map
 from .models import Attempt, Question, QuizSession, RecommendationLog, Topic, TopicEdge
+from .plans import get_plan, list_rank
 
-ALGORITHM_VERSION = "graph-v1"
-MAX_PER_TOPIC = 2
+ALGORITHM_VERSION = "plans-v1"
 DIFFICULTY_LEVEL = {"Easy": 0, "Medium": 1, "Hard": 2}
 
 WEIGHTS = {
@@ -28,6 +34,11 @@ WEIGHTS = {
     "novelty": 0.15,
     "difficulty_fit": 0.10,
     "staleness": 0.10,
+}
+# sprint: Hot 100 before Top Interview 150. random: shuffle within a fit.
+PLAN_WEIGHTS = {
+    "sprint": {"list": 0.30},
+    "random": {"jitter": 0.35},
 }
 
 
@@ -68,30 +79,34 @@ def recommend(
     today: date,
     limit: int,
     purpose: str,  # "daily" (new material) or "extra" (react to today's performance)
+    plan: str = "topic",
     exclude: set[int] | None = None,
 ) -> list[Scored]:
+    p = get_plan(plan)
     topics, prereqs = _graph(db)
-    mastery = mastery_map(db, user_id)
+    mastery = mastery_map(db, user_id)  # all plans
     exclude = set(exclude or ())
+    plan_weights = PLAN_WEIGHTS.get(p.id, {})
 
-    # Questions already served today in any session are not repeated.
+    # Questions already served today in this plan are not repeated.
     for qids in db.scalars(
         select(QuizSession.question_ids).where(
-            QuizSession.user_id == user_id, QuizSession.local_date == today
+            QuizSession.user_id == user_id, QuizSession.plan == p.id, QuizSession.local_date == today
         )
     ):
         exclude.update(qids)
 
     attempts = db.execute(
-        select(Attempt.question_id, Attempt.is_correct, Attempt.local_date)
+        select(Attempt.question_id, Attempt.is_correct, Attempt.local_date, Attempt.plan)
         .where(Attempt.user_id == user_id)
         .order_by(Attempt.created_at)
     ).all()
     last_seen: dict[int, date] = {}
     last_correct: dict[int, bool] = {}
-    for qid, ok, d in attempts:
-        last_seen[qid] = d
-        last_correct[qid] = ok
+    for qid, ok, d, a_plan in attempts:
+        if a_plan == p.id:
+            last_seen[qid] = d
+            last_correct[qid] = ok
 
     questions = list(
         db.scalars(
@@ -100,14 +115,19 @@ def recommend(
             .options(selectinload(Question.topics))
         )
     )
-    missed_today_topics: set[str] = set()
     q_by_id = {q.id: q for q in questions}
-    for qid, ok, d in attempts:
+    missed_today_topics: set[str] = set()
+    for qid, ok, d, _ in attempts:  # all plans
         if d == today and not ok and qid in q_by_id:
             missed_today_topics.update(t.topic_id for t in q_by_id[qid].topics)
+    if p.id == "sprint":
+        questions = [q for q in questions if list_rank(q.lc_number) is not None]
+    rng_seed = f"{user_id}:{today.isoformat()}:{p.id}:{purpose}"
 
     def unlocked(t: str) -> bool:
-        return all(is_ready(mastery.get(p)) for p in prereqs.get(t, []))
+        if not p.roadmap:
+            return True
+        return all(is_ready(mastery.get(pre)) for pre in prereqs.get(t, []))
 
     # --- 1-2. target topics, redirected to prerequisites when not ready
     targets: dict[str, Target] = {}
@@ -120,10 +140,10 @@ def recommend(
         if unlocked(topic_id):
             add_target(topic_id, Target(reason, missed_today=missed, priority=priority))
             return
-        for p in prereqs.get(topic_id, []):
-            if not is_ready(mastery.get(p)):
+        for pre in prereqs.get(topic_id, []):
+            if not is_ready(mastery.get(pre)):
                 add_target(
-                    p,
+                    pre,
                     Target(
                         f"Prerequisite for {topics[topic_id].name}",
                         missed_today=missed,
@@ -145,7 +165,8 @@ def recommend(
     for t in topics:
         m = mastery.get(t)
         if unlocked(t) and (m is None or m.attempts < READY_ATTEMPTS):
-            add_target(t, Target("Next on roadmap", priority=1 if purpose == "daily" else 3))
+            reason = "Next on roadmap" if p.roadmap else "New topic"
+            add_target(t, Target(reason, priority=1 if purpose == "daily" else 3))
 
     # --- 3. retrieve and filter
     def eligible(q: Question, allow_seen: bool) -> bool:
@@ -169,12 +190,20 @@ def recommend(
             "difficulty_fit": 1 - abs(DIFFICULTY_LEVEL[q.difficulty] - _target_level(m.mastery if m else None)) / 2,
             "staleness": 1.0 if not seen else min((today - last_seen[q.id]).days, 30) / 30,
         }
-        s = sum(WEIGHTS[k] * v for k, v in features.items())
+        if "list" in plan_weights:
+            features["list"] = list_rank(q.lc_number) or 0.0
+        if "jitter" in plan_weights:
+            features["jitter"] = random.Random(f"{rng_seed}:{q.id}").random()
+        s = sum({**WEIGHTS, **plan_weights}[k] * v for k, v in features.items())
         if target:
             s += 0.05 * (3 - target.priority)  # urgency tie-breaker
+        if topic_id != q.primary_topic_id:
+            s -= 0.1  # a secondary tag is weaker evidence the question practices this topic
         # Stable roadmap order as the final tie-breaker.
         s -= topics[topic_id].position * 1e-4 + q.id * 1e-7
         reason = target.reason if target else "New topic"
+        if p.id == "sprint" and reason in ("New topic", "Next on roadmap"):
+            reason = "Hot 100" if features["list"] == 1.0 else "Interview 150"
         return Scored(q.id, topic_id, round(s, 6), reason, {k: round(v, 3) for k, v in features.items()})
 
     def ranked(allow_seen: bool, only_targets: bool) -> list[Scored]:
@@ -198,14 +227,14 @@ def recommend(
         for c in candidates:
             if len(picked) >= limit:
                 return
-            if any(p.question_id == c.question_id for p in picked):
+            if any(x.question_id == c.question_id for x in picked):
                 continue
             if cap is not None and per_topic[c.topic_id] >= cap:
                 continue
             picked.append(c)
             per_topic[c.topic_id] += 1
 
-    take(ranked(allow_seen=False, only_targets=True), MAX_PER_TOPIC)
+    take(ranked(allow_seen=False, only_targets=True), p.per_topic_cap)
     take(ranked(allow_seen=False, only_targets=True), None)
     take(ranked(allow_seen=False, only_targets=False), None)
     if purpose == "daily":
@@ -216,9 +245,9 @@ def recommend(
             user_id=user_id,
             algorithm_version=ALGORITHM_VERSION,
             items=[
-                {"question_id": p.question_id, "topic": p.topic_id, "score": p.score,
-                 "reason": p.reason, "features": p.features, "purpose": purpose}
-                for p in picked
+                {"question_id": s.question_id, "topic": s.topic_id, "score": s.score,
+                 "reason": s.reason, "features": s.features, "purpose": purpose, "plan": p.id}
+                for s in picked
             ],
         )
     )

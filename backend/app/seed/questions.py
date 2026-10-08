@@ -15,7 +15,7 @@ LC = "https://leetcode.com/problems/{}/"
 QUESTIONS = [
     # ---------------------------------------------------------------- Arrays & Hashing
     dict(
-        slug="two-sum", n=1, title="Two Sum", diff="Easy", topics=["arrays"],
+        slug="two-sum", n=1, title="Two Sum", diff="Easy", topics=["data-structures"],
         summary="Given an unsorted integer array and a target, return the indices of the two entries that add up to the target. Exactly one pair works.",
         example="nums = [2, 7, 11, 15], target = 9  →  [0, 1]",
         criterion="Which approach is best when n is up to 10⁴ and you must return original indices?",
@@ -32,7 +32,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="group-anagrams", n=49, title="Group Anagrams", diff="Medium", topics=["arrays"],
+        slug="group-anagrams", n=49, title="Group Anagrams", diff="Medium", topics=["data-structures"],
         summary="Group a list of lowercase strings so that words that are anagrams of each other end up in the same group.",
         example='["eat","tea","tan","ate","nat","bat"]  →  [["eat","tea","ate"],["tan","nat"],["bat"]]',
         criterion="Which approach is the standard interview answer for n words of length ≤ k?",
@@ -49,7 +49,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="top-k-frequent-elements", n=347, title="Top K Frequent Elements", diff="Medium", topics=["arrays", "heap"],
+        slug="top-k-frequent-elements", n=347, title="Top K Frequent Elements", diff="Medium", topics=["data-structures"],
         summary="Return the k values that occur most often in an integer array. The answer is unique.",
         example="nums = [1,1,1,2,2,3], k = 2  →  [1, 2]",
         criterion="Which approach is best when k is much smaller than the number of distinct values?",
@@ -66,7 +66,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="product-of-array-except-self", n=238, title="Product of Array Except Self", diff="Medium", topics=["arrays"],
+        slug="product-of-array-except-self", n=238, title="Product of Array Except Self", diff="Medium", topics=["data-structures"],
         summary="For each position, output the product of every other element. Division is not allowed.",
         example="[1, 2, 3, 4]  →  [24, 12, 8, 6]",
         criterion="Which approach meets O(n) time without division, using only the output array as extra space?",
@@ -83,7 +83,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="longest-consecutive-sequence", n=128, title="Longest Consecutive Sequence", diff="Medium", topics=["arrays"],
+        slug="longest-consecutive-sequence", n=128, title="Longest Consecutive Sequence", diff="Medium", topics=["data-structures"],
         summary="Find the length of the longest run of consecutive integers that can be formed from the values of an unsorted array.",
         example="[100, 4, 200, 1, 3, 2]  →  4  (1, 2, 3, 4)",
         criterion="The problem requires O(n) time. Which approach meets it?",
@@ -101,7 +101,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Two Pointers
     dict(
-        slug="valid-palindrome", n=125, title="Valid Palindrome", diff="Easy", topics=["two-pointers"],
+        slug="valid-palindrome", n=125, title="Valid Palindrome", diff="Easy", topics=["sliding-window"],
         summary="Decide whether a string reads the same forward and backward after lowercasing and ignoring non-alphanumeric characters.",
         example='"A man, a plan, a canal: Panama"  →  true',
         criterion="Which approach uses O(1) extra space?",
@@ -118,7 +118,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="3sum", n=15, title="3Sum", diff="Medium", topics=["two-pointers", "arrays"],
+        slug="3sum", n=15, title="3Sum", diff="Medium", topics=["sliding-window"],
         summary="Return all unique triplets in an array whose values sum to zero.",
         example="[-1, 0, 1, 2, -1, -4]  →  [[-1, -1, 2], [-1, 0, 1]]",
         criterion="Which approach is the standard answer, handling duplicates cleanly with O(1) extra space?",
@@ -135,7 +135,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="container-with-most-water", n=11, title="Container With Most Water", diff="Medium", topics=["two-pointers"],
+        slug="container-with-most-water", n=11, title="Container With Most Water", diff="Medium", topics=["sliding-window"],
         summary="Given vertical line heights, pick two lines that together with the x-axis hold the most water. Area = width × shorter height.",
         example="[1, 8, 6, 2, 5, 4, 8, 3, 7]  →  49",
         criterion="Which approach is best for n up to 10⁵?",
@@ -152,7 +152,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="trapping-rain-water", n=42, title="Trapping Rain Water", diff="Hard", topics=["two-pointers", "stack"],
+        slug="trapping-rain-water", n=42, title="Trapping Rain Water", diff="Hard", topics=["sliding-window", "monotonic-stack"],
         summary="Given bar heights, compute how much rain water is trapped between the bars after it rains.",
         example="[0,1,0,2,1,0,1,3,2,1,2,1]  →  6",
         criterion="Which approach is best using O(1) extra space?",
@@ -170,7 +170,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Stack
     dict(
-        slug="valid-parentheses", n=20, title="Valid Parentheses", diff="Easy", topics=["stack"],
+        slug="valid-parentheses", n=20, title="Valid Parentheses", diff="Easy", topics=["data-structures"],
         summary="Decide whether a string of ()[]{} brackets is properly opened and closed in the right order.",
         example='"([]{})" → true,   "([)]" → false',
         criterion="Which approach is correct and linear?",
@@ -187,7 +187,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="daily-temperatures", n=739, title="Daily Temperatures", diff="Medium", topics=["stack"],
+        slug="daily-temperatures", n=739, title="Daily Temperatures", diff="Medium", topics=["monotonic-stack"],
         summary="For each day, find how many days you'd wait for a warmer temperature (0 if never).",
         example="[73,74,75,71,69,72,76,73]  →  [1,1,4,2,1,1,0,0]",
         criterion="Which approach is best for n up to 10⁵?",
@@ -204,7 +204,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="min-stack", n=155, title="Min Stack", diff="Medium", topics=["stack"],
+        slug="min-stack", n=155, title="Min Stack", diff="Medium", topics=["data-structures"],
         summary="Design a stack supporting push, pop, top and getMin, each in constant time.",
         example="push(-2), push(0), push(-3), getMin() → -3, pop(), getMin() → -2",
         criterion="All four operations must be O(1).",
@@ -274,7 +274,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Sliding Window
     dict(
-        slug="best-time-to-buy-and-sell-stock", n=121, title="Best Time to Buy and Sell Stock", diff="Easy", topics=["sliding-window"],
+        slug="best-time-to-buy-and-sell-stock", n=121, title="Best Time to Buy and Sell Stock", diff="Easy", topics=["data-structures", "dp"],
         summary="Given daily prices, choose one day to buy and a later day to sell for maximum profit (0 if no profit is possible).",
         example="[7, 1, 5, 3, 6, 4]  →  5",
         criterion="Which approach is best for n up to 10⁵?",
@@ -291,7 +291,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="longest-substring-without-repeating-characters", n=3, title="Longest Substring Without Repeating Characters", diff="Medium", topics=["sliding-window", "arrays"],
+        slug="longest-substring-without-repeating-characters", n=3, title="Longest Substring Without Repeating Characters", diff="Medium", topics=["sliding-window"],
         summary="Find the length of the longest contiguous substring that has no repeated characters.",
         example='"abcabcbb"  →  3  ("abc")',
         criterion="Which approach is best for strings up to 5·10⁴ characters?",
@@ -326,7 +326,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Linked List
     dict(
-        slug="reverse-linked-list", n=206, title="Reverse Linked List", diff="Easy", topics=["linked-list"],
+        slug="reverse-linked-list", n=206, title="Reverse Linked List", diff="Easy", topics=["trees"],
         summary="Reverse a singly linked list and return the new head.",
         example="1 → 2 → 3 → 4 → 5  →  5 → 4 → 3 → 2 → 1",
         criterion="Which approach uses O(1) extra space?",
@@ -343,7 +343,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="linked-list-cycle", n=141, title="Linked List Cycle", diff="Easy", topics=["linked-list", "two-pointers"],
+        slug="linked-list-cycle", n=141, title="Linked List Cycle", diff="Easy", topics=["trees", "sliding-window"],
         summary="Decide whether a linked list contains a cycle.",
         example="3 → 2 → 0 → -4 → (back to 2)  →  true",
         criterion="Which approach uses O(1) extra space?",
@@ -360,7 +360,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="merge-two-sorted-lists", n=21, title="Merge Two Sorted Lists", diff="Easy", topics=["linked-list"],
+        slug="merge-two-sorted-lists", n=21, title="Merge Two Sorted Lists", diff="Easy", topics=["trees"],
         summary="Merge two sorted linked lists into one sorted list by splicing their nodes together.",
         example="1→2→4 and 1→3→4  →  1→1→2→3→4→4",
         criterion="Which approach is linear with O(1) extra space?",
@@ -377,7 +377,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="lru-cache", n=146, title="LRU Cache", diff="Medium", topics=["linked-list", "arrays"],
+        slug="lru-cache", n=146, title="LRU Cache", diff="Medium", topics=["trees", "data-structures"],
         summary="Design a fixed-capacity cache where get and put run in O(1) and the least-recently-used key is evicted when full.",
         example="cap=2: put(1), put(2), get(1), put(3) evicts key 2",
         criterion="get and put must both be O(1) on average.",
@@ -464,7 +464,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Tries
     dict(
-        slug="implement-trie-prefix-tree", n=208, title="Implement Trie (Prefix Tree)", diff="Medium", topics=["tries", "trees"],
+        slug="implement-trie-prefix-tree", n=208, title="Implement Trie (Prefix Tree)", diff="Medium", topics=["data-structures"],
         summary="Design a structure supporting insert(word), search(word) and startsWith(prefix).",
         example='insert("apple"), search("app") → false, startsWith("app") → true',
         criterion="Each operation should cost O(L) for a word of length L.",
@@ -481,7 +481,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="word-search-ii", n=212, title="Word Search II", diff="Hard", topics=["tries", "backtracking"],
+        slug="word-search-ii", n=212, title="Word Search II", diff="Hard", topics=["data-structures", "trees"],
         summary="Given a letter grid and a list of words, return every word that can be traced through adjacent cells without reusing a cell.",
         example='board 4×4, words = ["oath","pea","eat","rain"]  →  ["eat","oath"]',
         criterion="Which approach scales to 3·10⁴ words?",
@@ -499,7 +499,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Heap
     dict(
-        slug="kth-largest-element-in-an-array", n=215, title="Kth Largest Element in an Array", diff="Medium", topics=["heap"],
+        slug="kth-largest-element-in-an-array", n=215, title="Kth Largest Element in an Array", diff="Medium", topics=["data-structures"],
         summary="Return the k-th largest value in an unsorted array (by sorted position, duplicates count).",
         example="[3,2,1,5,6,4], k = 2  →  5",
         criterion="Which approach is the standard answer with guaranteed performance when k ≪ n?",
@@ -516,7 +516,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="merge-k-sorted-lists", n=23, title="Merge k Sorted Lists", diff="Hard", topics=["heap", "linked-list"],
+        slug="merge-k-sorted-lists", n=23, title="Merge k Sorted Lists", diff="Hard", topics=["data-structures", "trees"],
         summary="Merge k sorted linked lists into one sorted linked list.",
         example="[1→4→5, 1→3→4, 2→6]  →  1→1→2→3→4→4→5→6",
         criterion="Which approach is best for N total nodes across k lists?",
@@ -533,7 +533,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="k-closest-points-to-origin", n=973, title="K Closest Points to Origin", diff="Medium", topics=["heap"],
+        slug="k-closest-points-to-origin", n=973, title="K Closest Points to Origin", diff="Medium", topics=["data-structures"],
         summary="Return the k points closest to (0, 0) by Euclidean distance.",
         example="[[1,3], [-2,2]], k = 1  →  [[-2,2]]",
         criterion="Which approach is best when k ≪ n?",
@@ -550,7 +550,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="find-median-from-data-stream", n=295, title="Find Median from Data Stream", diff="Hard", topics=["heap"],
+        slug="find-median-from-data-stream", n=295, title="Find Median from Data Stream", diff="Hard", topics=["data-structures"],
         summary="Design a structure that accepts numbers one at a time and can report the median of everything seen so far.",
         example="add 1, add 2 → median 1.5, add 3 → median 2",
         criterion="Which design has the best addNum / findMedian costs?",
@@ -568,7 +568,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Backtracking
     dict(
-        slug="subsets", n=78, title="Subsets", diff="Medium", topics=["backtracking"],
+        slug="subsets", n=78, title="Subsets", diff="Medium", topics=["trees"],
         summary="Return every subset (the power set) of an array of distinct integers.",
         example="[1, 2, 3]  →  [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]",
         criterion="Which approach generates each subset exactly once?",
@@ -585,7 +585,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="combination-sum", n=39, title="Combination Sum", diff="Medium", topics=["backtracking"],
+        slug="combination-sum", n=39, title="Combination Sum", diff="Medium", topics=["trees"],
         summary="Given distinct positive candidates and a target, list every combination (numbers may repeat) that sums to the target.",
         example="candidates = [2,3,6,7], target = 7  →  [[2,2,3], [7]]",
         criterion="Which approach lists every combination without duplicates?",
@@ -602,7 +602,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="word-search", n=79, title="Word Search", diff="Medium", topics=["backtracking", "graphs"],
+        slug="word-search", n=79, title="Word Search", diff="Medium", topics=["trees", "grid"],
         summary="Decide whether a word can be traced through horizontally or vertically adjacent cells of a grid, using each cell at most once.",
         example='board 3×4, word = "ABCCED"  →  true',
         criterion="Which approach correctly respects the no-reuse rule efficiently?",
@@ -620,7 +620,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Graphs
     dict(
-        slug="number-of-islands", n=200, title="Number of Islands", diff="Medium", topics=["graphs"],
+        slug="number-of-islands", n=200, title="Number of Islands", diff="Medium", topics=["grid"],
         summary="Count the connected groups of '1' cells (land) in a grid, connecting horizontally and vertically.",
         example='[["1","1","0"],["1","0","0"],["0","0","1"]]  →  2',
         criterion="Which approach is the standard linear answer?",
@@ -654,7 +654,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="rotting-oranges", n=994, title="Rotting Oranges", diff="Medium", topics=["graphs"],
+        slug="rotting-oranges", n=994, title="Rotting Oranges", diff="Medium", topics=["grid"],
         summary="Each minute, rotten oranges rot their fresh 4-directional neighbors. Return the minutes until no fresh orange remains, or −1 if impossible.",
         example="[[2,1,1],[1,1,0],[0,1,1]]  →  4",
         criterion="Which approach is linear in the grid size?",
@@ -689,7 +689,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Advanced Graphs
     dict(
-        slug="network-delay-time", n=743, title="Network Delay Time", diff="Medium", topics=["advanced-graphs", "heap"],
+        slug="network-delay-time", n=743, title="Network Delay Time", diff="Medium", topics=["graphs", "data-structures"],
         summary="A signal starts at node k in a directed graph with positive edge travel times. Return the time for all nodes to receive it, or −1.",
         example="times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2  →  2",
         criterion="Which approach is best for positive weights?",
@@ -706,7 +706,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="min-cost-to-connect-all-points", n=1584, title="Min Cost to Connect All Points", diff="Medium", topics=["advanced-graphs"],
+        slug="min-cost-to-connect-all-points", n=1584, title="Min Cost to Connect All Points", diff="Medium", topics=["graphs"],
         summary="Connect all 2-D points so any two are linked by some path, minimizing total Manhattan edge length.",
         example="[[0,0],[2,2],[3,10],[5,2],[7,0]]  →  20",
         criterion="Which approach is the standard answer?",
@@ -724,7 +724,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Intervals
     dict(
-        slug="merge-intervals", n=56, title="Merge Intervals", diff="Medium", topics=["intervals"],
+        slug="merge-intervals", n=56, title="Merge Intervals", diff="Medium", topics=["greedy"],
         summary="Merge all overlapping intervals and return the non-overlapping result.",
         example="[[1,3],[2,6],[8,10],[15,18]]  →  [[1,6],[8,10],[15,18]]",
         criterion="Which approach is the standard answer?",
@@ -741,7 +741,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="meeting-rooms-ii", n=253, title="Meeting Rooms II", diff="Medium", topics=["intervals", "heap"],
+        slug="meeting-rooms-ii", n=253, title="Meeting Rooms II", diff="Medium", topics=["data-structures", "greedy"],
         summary="Given meeting time intervals, return the minimum number of rooms needed so no meetings overlap in the same room.",
         example="[[0,30],[5,10],[15,20]]  →  2",
         criterion="Which approach is the standard answer?",
@@ -758,7 +758,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="non-overlapping-intervals", n=435, title="Non-overlapping Intervals", diff="Medium", topics=["intervals", "greedy"],
+        slug="non-overlapping-intervals", n=435, title="Non-overlapping Intervals", diff="Medium", topics=["greedy"],
         summary="Return the minimum number of intervals to remove so the rest do not overlap.",
         example="[[1,2],[2,3],[3,4],[1,3]]  →  1",
         criterion="Which approach is best for n up to 10⁵?",
@@ -776,7 +776,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- Greedy
     dict(
-        slug="maximum-subarray", n=53, title="Maximum Subarray", diff="Medium", topics=["greedy", "dp-1d"],
+        slug="maximum-subarray", n=53, title="Maximum Subarray", diff="Medium", topics=["dp", "data-structures"],
         summary="Find the largest sum of any non-empty contiguous subarray.",
         example="[-2,1,-3,4,-1,2,1,-5,4]  →  6  ([4,-1,2,1])",
         criterion="Which approach is best for n up to 10⁵?",
@@ -811,7 +811,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- 1-D DP
     dict(
-        slug="climbing-stairs", n=70, title="Climbing Stairs", diff="Easy", topics=["dp-1d"],
+        slug="climbing-stairs", n=70, title="Climbing Stairs", diff="Easy", topics=["dp"],
         summary="You climb 1 or 2 steps at a time. Count the distinct ways to reach step n.",
         example="n = 3  →  3  (1+1+1, 1+2, 2+1)",
         criterion="Which approach is linear with O(1) space?",
@@ -828,7 +828,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="house-robber", n=198, title="House Robber", diff="Medium", topics=["dp-1d"],
+        slug="house-robber", n=198, title="House Robber", diff="Medium", topics=["dp"],
         summary="Pick houses to rob for maximum money without ever robbing two adjacent houses.",
         example="[2, 7, 9, 3, 1]  →  12  (2 + 9 + 1)",
         criterion="Which approach is linear with O(1) space?",
@@ -845,7 +845,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="coin-change", n=322, title="Coin Change", diff="Medium", topics=["dp-1d"],
+        slug="coin-change", n=322, title="Coin Change", diff="Medium", topics=["dp"],
         summary="Given coin denominations (unlimited supply) and an amount, return the fewest coins that sum to the amount, or −1.",
         example="coins = [1, 2, 5], amount = 11  →  3  (5 + 5 + 1)",
         criterion="Which approach is correct for arbitrary denominations?",
@@ -862,7 +862,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="word-break", n=139, title="Word Break", diff="Medium", topics=["dp-1d"],
+        slug="word-break", n=139, title="Word Break", diff="Medium", topics=["dp"],
         summary="Decide whether a string can be split into a sequence of dictionary words (words may be reused).",
         example='s = "leetcode", dict = ["leet", "code"]  →  true',
         criterion="Which approach is polynomial and correct?",
@@ -879,7 +879,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="longest-increasing-subsequence", n=300, title="Longest Increasing Subsequence", diff="Medium", topics=["dp-1d", "binary-search"],
+        slug="longest-increasing-subsequence", n=300, title="Longest Increasing Subsequence", diff="Medium", topics=["dp", "binary-search"],
         summary="Return the length of the longest strictly increasing subsequence (not necessarily contiguous).",
         example="[10, 9, 2, 5, 3, 7, 101, 18]  →  4  (2, 3, 7, 101)",
         criterion="The follow-up asks for better than O(n²). Which approach achieves it?",
@@ -897,7 +897,7 @@ QUESTIONS = [
     ),
     # ---------------------------------------------------------------- 2-D DP
     dict(
-        slug="unique-paths", n=62, title="Unique Paths", diff="Medium", topics=["dp-2d"],
+        slug="unique-paths", n=62, title="Unique Paths", diff="Medium", topics=["dp"],
         summary="A robot moves only right or down on an m × n grid. Count the paths from the top-left to the bottom-right corner.",
         example="m = 3, n = 7  →  28",
         criterion="Which approach is the standard DP answer?",
@@ -914,7 +914,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="longest-common-subsequence", n=1143, title="Longest Common Subsequence", diff="Medium", topics=["dp-2d"],
+        slug="longest-common-subsequence", n=1143, title="Longest Common Subsequence", diff="Medium", topics=["dp"],
         summary="Return the length of the longest subsequence common to two strings.",
         example='"abcde", "ace"  →  3  ("ace")',
         criterion="Which approach is the standard polynomial answer?",
@@ -949,7 +949,7 @@ QUESTIONS = [
         ],
     ),
     dict(
-        slug="counting-bits", n=338, title="Counting Bits", diff="Easy", topics=["bit-manipulation", "dp-1d"],
+        slug="counting-bits", n=338, title="Counting Bits", diff="Easy", topics=["bit-manipulation", "dp"],
         summary="For every i from 0 to n, return the number of 1 bits in i.",
         example="n = 5  →  [0, 1, 1, 2, 1, 2]",
         criterion="The follow-up asks for a single O(n) pass. Which approach meets it?",

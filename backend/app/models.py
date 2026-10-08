@@ -32,6 +32,7 @@ class User(Base):
     display_name: Mapped[str] = mapped_column(String(80), default="")
     timezone: Mapped[str] = mapped_column(String(64), default="UTC")
     daily_goal: Mapped[int] = mapped_column(Integer, default=5)
+    plan: Mapped[str] = mapped_column(String(10), default="topic")  # see plans.py
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
@@ -82,6 +83,8 @@ class Question(Base):
     version: Mapped[int] = mapped_column(Integer, default=1)
     status: Mapped[str] = mapped_column(String(20), default="published")
     lc_number: Mapped[int | None] = mapped_column(Integer)
+    # Display id for problems without a LeetCode number, e.g. "LCP 67" (leetcode.cn only).
+    ref: Mapped[str | None] = mapped_column(String(20))
     title: Mapped[str] = mapped_column(String(200))
     difficulty: Mapped[str] = mapped_column(String(10))
     # Original summary, not the source problem text.
@@ -151,6 +154,7 @@ class QuizSession(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     mode: Mapped[str] = mapped_column(String(10))  # daily | review | extra
+    plan: Mapped[str] = mapped_column(String(10), default="topic")
     local_date: Mapped[date] = mapped_column(Date, index=True)
     question_ids: Mapped[list[int]] = mapped_column(JSON)
     # question_id (as str) -> shuffled list of choice ids
@@ -170,6 +174,7 @@ class Attempt(Base):
     choice_id: Mapped[int] = mapped_column(ForeignKey("choices.id"))
     is_correct: Mapped[bool] = mapped_column(Boolean)
     mode: Mapped[str] = mapped_column(String(10))
+    plan: Mapped[str] = mapped_column(String(10), default="topic")
     local_date: Mapped[date] = mapped_column(Date, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
@@ -177,18 +182,21 @@ class Attempt(Base):
 
 
 class ReviewItem(Base):
-    """One scheduled review of a question, created when it is first solved."""
+    """One scheduled review of a question, created when it is first solved in a plan."""
 
     __tablename__ = "review_items"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    plan: Mapped[str] = mapped_column(String(10), default="topic")
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
     stage: Mapped[int] = mapped_column(Integer)
     due_date: Mapped[date] = mapped_column(Date, index=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    __table_args__ = (UniqueConstraint("user_id", "question_id", "stage"),)
+    __table_args__ = (
+        UniqueConstraint("user_id", "plan", "question_id", "stage", name="uq_review_items_user_plan_question_stage"),
+    )
 
 
 class UserTopicMastery(Base):

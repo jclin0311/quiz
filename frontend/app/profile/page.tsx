@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import Dolphin from "@/components/Dolphin";
-import { api, patch, post, User } from "@/lib/api";
+import { api, patch, Plan, PLANS, post, User } from "@/lib/api";
 
 function timezones(current: string): string[] {
   let list: string[] = [];
@@ -45,6 +45,17 @@ export default function ProfilePage() {
     }
   };
 
+  const choosePlan = async (plan: Plan) => {
+    if (!user || plan === user.plan) return;
+    const previous = user;
+    setUser({ ...user, plan });
+    try {
+      setUser(await patch<User>("/me", { plan }));
+    } catch {
+      setUser(previous);
+    }
+  };
+
   const logout = async () => {
     await post("/auth/logout").catch(() => {});
     window.location.replace("/login");
@@ -64,6 +75,22 @@ export default function ProfilePage() {
         <div style={{ minWidth: 0 }}>
           <div style={{ fontFamily: "var(--serif)", fontSize: 19 }}>{user.display_name}</div>
           <div className="small muted">{user.name}{user.email ? ` · ${user.email}` : ""}</div>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="eyebrow" style={{ marginBottom: 6 }}>Plan</div>
+        <div role="radiogroup" aria-label="Plan">
+          {PLANS.map((p) => (
+            <button key={p.id} type="button" role="radio" aria-checked={user.plan === p.id}
+              className={`plan${user.plan === p.id ? " on" : ""}`} onClick={() => choosePlan(p.id)}>
+              <span className="body">
+                <span className="title">{p.name}</span>
+                <span className="small muted">{p.note}</span>
+              </span>
+              <span className="mark" aria-hidden="true" />
+            </button>
+          ))}
         </div>
       </div>
 

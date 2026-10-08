@@ -47,6 +47,7 @@ export function browserTimezone(): string {
 // ---- types
 
 export type Mode = "daily" | "review" | "extra";
+export type Plan = "topic" | "random" | "sprint";
 
 export interface User {
   id: number;
@@ -56,6 +57,7 @@ export interface User {
   avatar_url: string | null;
   timezone: string;
   daily_goal: number;
+  plan: Plan;
 }
 
 export interface Progress {
@@ -99,6 +101,7 @@ export interface QuizItem {
     id: number;
     title: string;
     lc_number: number | null;
+    ref: string | null;
     difficulty: "Easy" | "Medium" | "Hard";
     summary: string;
     example: string;
@@ -116,6 +119,8 @@ export interface QuizItem {
 export interface QuizSession {
   id: number;
   mode: Mode;
+  plan: Plan;
+  hide_topics: boolean;
   local_date: string;
   finished: boolean;
   items: QuizItem[];
@@ -142,6 +147,25 @@ export interface TopicGraph {
   nodes: { id: string; name: string; x: number; y: number; questions: number; attempts: number; mastery: number | null }[];
   edges: { from: string; to: string }[];
 }
+
+export const PLANS: { id: Plan; name: string; note: string }[] = [
+  { id: "topic", name: "Topic", note: "One pattern at a time" },
+  { id: "random", name: "Random", note: "Mixed, unlabeled" },
+  { id: "sprint", name: "Sprint", note: "Hot 100, then Interview 150" },
+];
+
+export const PLAN_LABEL = Object.fromEntries(PLANS.map((p) => [p.id, p.name])) as Record<Plan, string>;
+
+// Short topic names for tight spaces (roadmap nodes, chart axes).
+const TOPIC_SHORT: Record<string, string> = {
+  "sliding-window": "Sliding Window",
+  trees: "Trees & Backtracking",
+  dp: "DP",
+  graphs: "Graphs",
+  greedy: "Greedy",
+};
+
+export const topicLabel = (id: string, name: string) => TOPIC_SHORT[id] ?? name;
 
 export const MODE_LABEL: Record<Mode, string> = {
   daily: "Practice",

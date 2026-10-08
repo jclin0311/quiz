@@ -255,8 +255,8 @@ export default function QuizPage() {
       <h1 className="q-title">{q.title}</h1>
       <div className="q-meta">
         <span className={`chip ${q.difficulty}`}>{q.difficulty}</span>
-        {q.lc_number && <span className="chip">#{q.lc_number}</span>}
-        {q.topics.map((t) => <span key={t.id} className="chip">{t.name}</span>)}
+        {(q.ref || q.lc_number) && <span className="chip">{q.ref ?? `#${q.lc_number}`}</span>}
+        {(result || !session.hide_topics) && q.topics.map((t) => <span key={t.id} className="chip">{t.name}</span>)}
       </div>
       <p className="q-criterion">{q.criterion}</p>
 

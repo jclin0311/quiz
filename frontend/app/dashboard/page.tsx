@@ -7,7 +7,7 @@ import {
 import BottomNav from "@/components/BottomNav";
 import Dolphin from "@/components/Dolphin";
 import TopicGraph from "@/components/TopicGraph";
-import { api, DashboardStats, TopicGraph as Graph } from "@/lib/api";
+import { api, DashboardStats, TopicGraph as Graph, topicLabel } from "@/lib/api";
 
 const axis = { fontSize: 11, fill: "var(--muted)" };
 const tooltipStyle = {
@@ -121,10 +121,10 @@ export default function DashboardPage() {
             <h2 className="h2">By topic</h2>
             <div style={{ width: "100%", height: Math.max(120, stats.topic_accuracy.length * 30 + 30) }}>
               <ResponsiveContainer>
-                <BarChart data={stats.topic_accuracy} layout="vertical" margin={{ left: 0, right: 16, top: 4, bottom: 4 }}>
+                <BarChart data={stats.topic_accuracy.map((x) => ({ ...x, label: topicLabel(x.topic, x.name) }))} layout="vertical" margin={{ left: 0, right: 16, top: 4, bottom: 4 }}>
                   <CartesianGrid horizontal={false} stroke="var(--chart-grid)" />
                   <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={axis} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" width={138} tick={{ ...axis, fill: "var(--ink-2)" }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="label" width={138} tick={{ ...axis, fill: "var(--ink-2)" }} axisLine={false} tickLine={false} />
                   <Tooltip {...tooltipStyle} formatter={(v, _n, p) => [`${v}% (${p.payload.correct}/${p.payload.attempts})`, ""]} />
                   <Bar dataKey="accuracy" fill="var(--chart)" barSize={14} radius={[0, 4, 4, 0]} />
                 </BarChart>

@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
+from typing import Literal
+
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -8,6 +10,7 @@ from ..auth import current_user
 from ..clock import local_today, valid_timezone
 from ..db import get_db
 from ..models import Attempt, QuizSession, User
+from ..plans import get_plan
 from ..scheduling import due_review_question_ids
 
 router = APIRouter(prefix="/api", tags=["profile"])
@@ -17,6 +20,7 @@ class ProfileUpdate(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=40)
     timezone: str | None = None
     daily_goal: int | None = Field(default=None, ge=1, le=20)
+    plan: Literal["topic", "random", "sprint"] | None = None
 
 
 def user_payload(user: User) -> dict:
@@ -28,6 +32,7 @@ def user_payload(user: User) -> dict:
         "avatar_url": user.avatar_url,
         "timezone": user.timezone,
         "daily_goal": user.daily_goal,
+        "plan": get_plan(user.plan).id,
     }
 
 
@@ -49,6 +54,8 @@ def update_me(body: ProfileUpdate, user: User = Depends(current_user), db: Sessi
         user.timezone = body.timezone
     if body.daily_goal is not None:
         user.daily_goal = body.daily_goal
+    if body.plan is not None:
+        user.plan = body.plan
     db.commit()
     return user_payload(user)
 
@@ -76,10 +83,11 @@ def _progress(db: Session, session: QuizSession | None) -> dict | None:
 @router.get("/home")
 def home(user: User = Depends(current_user), db: Session = Depends(get_db)):
     today = local_today(user.timezone)
+    plan = get_plan(user.plan).id
     sessions = list(
         db.scalars(
             select(QuizSession)
-            .where(QuizSession.user_id == user.id, QuizSession.local_date == today)
+            .where(QuizSession.user_id == user.id, QuizSession.plan == plan, QuizSession.local_date == today)
             .order_by(QuizSession.id)
         )
     )
@@ -96,7 +104,7 @@ def home(user: User = Depends(current_user), db: Session = Depends(get_db)):
         "streak": streak(db, user.id, today),
         "daily": _progress(db, daily) or {"session_id": None, "total": user.daily_goal, "answered": 0, "correct": 0},
         "review": _progress(db, review)
-        or {"session_id": None, "total": len(due_review_question_ids(db, user.id, today)), "answered": 0, "correct": 0},
+        or {"session_id": None, "total": len(due_review_question_ids(db, user.id, plan, today)), "answered": 0, "correct": 0},
         "extra": [_progress(db, s) for s in extras],
         "resume": unfinished,
     }

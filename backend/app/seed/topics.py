@@ -1,47 +1,31 @@
-# Topic roadmap from the design doc's prerequisite graph.
+# The 12 topic lists from "如何科学刷题" (leetcode.cn/discuss/post/3141566).
 # (id, name, x, y) — x/y are layout positions on a 0-100 grid.
 TOPICS = [
-    ("arrays", "Arrays & Hashing", 54, 3),
-    ("two-pointers", "Two Pointers", 42, 15),
-    ("stack", "Stack", 66, 14),
-    ("binary-search", "Binary Search", 22, 29),
-    ("sliding-window", "Sliding Window", 46, 29),
-    ("linked-list", "Linked List", 70, 29),
-    ("trees", "Trees", 46, 42),
-    ("tries", "Tries", 22, 54),
-    ("backtracking", "Backtracking", 66, 54),
-    ("heap", "Heap / Priority Queue", 36, 66),
-    ("graphs", "Graphs", 60, 68),
-    ("dp-1d", "1-D Dynamic Programming", 86, 68),
-    ("intervals", "Intervals", 8, 80),
-    ("greedy", "Greedy", 28, 92),
-    ("advanced-graphs", "Advanced Graphs", 50, 81),
-    ("dp-2d", "2-D Dynamic Programming", 72, 92),
-    ("bit-manipulation", "Bit Manipulation", 91, 81),
-    ("math", "Math & Geometry", 86, 103),
+    ("sliding-window", "Sliding Window & Two Pointers", 50, 3),
+    ("binary-search", "Binary Search", 50, 18),
+    ("bit-manipulation", "Bit Manipulation", 84, 18),
+    ("data-structures", "Data Structures", 50, 33),
+    ("trees", "Linked Lists, Trees & Backtracking", 50, 48),
+    ("monotonic-stack", "Monotonic Stack", 16, 48),
+    ("strings", "Strings", 84, 48),
+    ("grid", "Grid Graphs", 50, 63),
+    ("dp", "Dynamic Programming", 50, 78),
+    ("graphs", "Graph Algorithms", 84, 78),
+    ("greedy", "Greedy & Thinking", 30, 93),
+    ("math", "Math", 70, 93),
 ]
 
-# (prerequisite, dependent)
+# Core route, steps 1-7 (step 0 is programming basics; trees covers steps 4 and 6).
+CORE_ROUTE = ["sliding-window", "binary-search", "data-structures", "trees", "grid", "dp"]
+
+# (prerequisite, dependent): the core route in order, then each remaining list
+# after the core topic it builds on.
 EDGES = [
-    ("arrays", "two-pointers"),
-    ("arrays", "stack"),
-    ("two-pointers", "binary-search"),
-    ("two-pointers", "sliding-window"),
-    ("two-pointers", "linked-list"),
-    ("binary-search", "trees"),
-    ("linked-list", "trees"),
-    ("trees", "tries"),
-    ("trees", "heap"),
-    ("trees", "backtracking"),
-    ("backtracking", "graphs"),
-    ("backtracking", "dp-1d"),
-    ("heap", "intervals"),
-    ("heap", "greedy"),
-    ("heap", "advanced-graphs"),
-    ("graphs", "advanced-graphs"),
-    ("graphs", "dp-2d"),
-    ("dp-1d", "dp-2d"),
-    ("dp-1d", "bit-manipulation"),
-    ("dp-2d", "math"),
-    ("bit-manipulation", "math"),
+    *zip(CORE_ROUTE, CORE_ROUTE[1:]),
+    ("sliding-window", "bit-manipulation"),
+    ("data-structures", "monotonic-stack"),
+    ("data-structures", "strings"),
+    ("grid", "graphs"),
+    ("dp", "greedy"),
+    ("dp", "math"),
 ]

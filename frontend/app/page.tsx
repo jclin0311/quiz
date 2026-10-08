@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import BottomNav from "@/components/BottomNav";
 import Dolphin from "@/components/Dolphin";
 import Enso from "@/components/Enso";
-import { api, ApiError, Home, MODE_LABEL, Mode, post, Progress, QuizSession } from "@/lib/api";
+import { api, ApiError, Home, Mode, PLAN_LABEL, post, Progress, QuizSession } from "@/lib/api";
 
 function greeting(name: string): string {
   const h = new Date().getHours();
@@ -64,12 +64,13 @@ export default function HomePage() {
   const { daily, review } = home;
   const dailyDone = daily.session_id !== null && daily.answered >= daily.total;
   const reviewDone = review.total === 0 || review.answered >= review.total;
+  const extraAnswered = home.extra.reduce((n, p) => n + p.answered, 0);
 
   const dateLabel = new Date(home.today + "T12:00:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
 
   return (
     <main className="shell">
-      <div className="eyebrow">{dateLabel}</div>
+      <div className="eyebrow">{dateLabel} · {PLAN_LABEL[home.user.plan]}</div>
       <div className="greeting" style={{ marginTop: 10 }}>
         <p className="bubble" style={{ margin: 0, flex: 1 }}>{greeting(name)}</p>
         <Dolphin size={48} mood={dailyDone ? "cheer" : "happy"} />
@@ -123,9 +124,7 @@ export default function HomePage() {
           icon="03"
           title="Extra"
           subtitle={
-            home.extra.length
-              ? `${home.extra.length * 5} done today`
-              : "5 questions"
+            extraAnswered ? `${extraAnswered} done today` : "5 questions"
           }
           onClick={() => start("extra")}
           disabled={busy !== null}

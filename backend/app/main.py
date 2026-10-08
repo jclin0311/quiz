@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .db import Base, SessionLocal, engine
+from .migrate import migrate
 from .routers import auth, dashboard, me, quiz
 from .seed import seed
 
@@ -13,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(engine)
+    migrate(engine)
     with SessionLocal() as db:
         seed(db)
     yield
